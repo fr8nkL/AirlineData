@@ -1,0 +1,4472 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# CIS 545"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "b229a6dc7c38a2041fb06edd93f1609c",
+     "grade": false,
+     "grade_id": "setup",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "## CIS 545 Homework 1 - Spring 2019\n",
+    "# Updated January 2019"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "8bf9d85584db5906fcbd41a3ab3ea66c",
+     "grade": false,
+     "grade_id": "hw1-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## Part 2: Data Wrangling and Analysis\n",
+    "\n",
+    "Now, having set up our data from Part 1 earlier, we can pull data from those tables and conduct some data analysis. Part of the reason we had you store tables in advance was to create a sort of \"checkpoint\" in the middle of the assignment - after running Homework 1-1, you should be able to just start from your `HW1_DB` - although you can definitely go back and update your 1-1, and then pull from the database again!\n",
+    "\n",
+    "To recap briefly from before: \n",
+    "\n",
+    "*Terminology*      \n",
+    "We’ll generally use `field`, `column`, and `attribute` interchangeably to mean a named column in a DataFrame.  We’ll also generally assume that `table`, `DataFrame`, and `relation` mean the same thing.\n",
+    "\n",
+    "*Submission*      \n",
+    "See the external document for submission information.  Remember to also do **Homework 1, Part 2** and optionally **Homework 1-Advanced**.\n",
+    "\n",
+    "*NBGrader Information*      \n",
+    "We're using a package called `nbgrader` to grade your assignments using an autograding system. With that, there's a couple things to take note:\n",
+    "- If we specify a format, please use it!\n",
+    "- Some cells will not be able to be edited - that is totally fine, we'll mark them\n",
+    "- You may add/remove cells, but if a cell is marked test cases, please don't change it...just add cells before/after it!"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "57120fe7038f0885fce0c0a98a6a5c99",
+     "grade": false,
+     "grade_id": "step4",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## Step 4: Data Wrangling\n",
+    "\n",
+    "Start off by connecting to the database (as above), import pandas as pd, and then load back your DataFrames: airlines, airports, routes, incidents and flights from SQL, using the syntax:\n",
+    "\n",
+    "`dataframe = pd.read_sql_query('select * from table_name', engine)`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "7c70fef798693182b38a9effe6d66f99",
+     "grade": false,
+     "grade_id": "sqlite-intro",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Just run this cell! Then proceed to the next one\n",
+    "import sqlite3\n",
+    "import pandas as pd\n",
+    "\n",
+    "engine = sqlite3.connect('HW1_DB')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "5d9a269a36e1e6b30bdf2f930880bc79",
+     "grade": false,
+     "grade_id": "reload-data",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [
+    {
+     "ename": "DatabaseError",
+     "evalue": "Execution failed on sql 'select * from airlines': no such table: airlines",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mOperationalError\u001b[0m                          Traceback (most recent call last)",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/io/sql.py\u001b[0m in \u001b[0;36mexecute\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1377\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1378\u001b[0;31m                 \u001b[0mcur\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1379\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mcur\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mOperationalError\u001b[0m: no such table: airlines",
+      "\nDuring handling of the above exception, another exception occurred:\n",
+      "\u001b[0;31mDatabaseError\u001b[0m                             Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-2-77b20d907b42>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;31m# raise NotImplementedError()\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 6\u001b[0;31m \u001b[0mairlines_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread_sql_query\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'select * from airlines'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mengine\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      7\u001b[0m \u001b[0mairports_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread_sql_query\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'select * from airports'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mengine\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0mroutes_df\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mread_sql_query\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'select * from routes'\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mengine\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/io/sql.py\u001b[0m in \u001b[0;36mread_sql_query\u001b[0;34m(sql, con, index_col, coerce_float, params, parse_dates, chunksize)\u001b[0m\n\u001b[1;32m    312\u001b[0m     return pandas_sql.read_query(\n\u001b[1;32m    313\u001b[0m         \u001b[0msql\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mindex_col\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mindex_col\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mparams\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcoerce_float\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcoerce_float\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 314\u001b[0;31m         parse_dates=parse_dates, chunksize=chunksize)\n\u001b[0m\u001b[1;32m    315\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    316\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/io/sql.py\u001b[0m in \u001b[0;36mread_query\u001b[0;34m(self, sql, index_col, coerce_float, params, parse_dates, chunksize)\u001b[0m\n\u001b[1;32m   1411\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1412\u001b[0m         \u001b[0margs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0m_convert_params\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0msql\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1413\u001b[0;31m         \u001b[0mcursor\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1414\u001b[0m         \u001b[0mcolumns\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0mcol_desc\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mcol_desc\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mcursor\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdescription\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1415\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/io/sql.py\u001b[0m in \u001b[0;36mexecute\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1388\u001b[0m             ex = DatabaseError(\n\u001b[1;32m   1389\u001b[0m                 \"Execution failed on sql '%s': %s\" % (args[0], exc))\n\u001b[0;32m-> 1390\u001b[0;31m             \u001b[0mraise_with_traceback\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mex\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1391\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1392\u001b[0m     \u001b[0;34m@\u001b[0m\u001b[0mstaticmethod\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/compat/__init__.py\u001b[0m in \u001b[0;36mraise_with_traceback\u001b[0;34m(exc, traceback)\u001b[0m\n\u001b[1;32m    402\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mtraceback\u001b[0m \u001b[0;34m==\u001b[0m \u001b[0mEllipsis\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    403\u001b[0m             \u001b[0m_\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0m_\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtraceback\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msys\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexc_info\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 404\u001b[0;31m         \u001b[0;32mraise\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mwith_traceback\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtraceback\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    405\u001b[0m \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    406\u001b[0m     \u001b[0;31m# this version of raise is a syntax error in Python 3\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m~/anaconda3/lib/python3.7/site-packages/pandas/io/sql.py\u001b[0m in \u001b[0;36mexecute\u001b[0;34m(self, *args, **kwargs)\u001b[0m\n\u001b[1;32m   1376\u001b[0m                 \u001b[0mcur\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m**\u001b[0m\u001b[0mkwargs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1377\u001b[0m             \u001b[0;32melse\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1378\u001b[0;31m                 \u001b[0mcur\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mexecute\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m*\u001b[0m\u001b[0margs\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1379\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mcur\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1380\u001b[0m         \u001b[0;32mexcept\u001b[0m \u001b[0mException\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mexc\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mDatabaseError\u001b[0m: Execution failed on sql 'select * from airlines': no such table: airlines"
+     ]
+    }
+   ],
+   "source": [
+    "# TODO: Re-load dataframes from SQL\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "airlines_df = pd.read_sql_query('select * from airlines', engine)\n",
+    "airports_df = pd.read_sql_query('select * from airports', engine)\n",
+    "routes_df = pd.read_sql_query('select * from routes', engine)\n",
+    "incidents_df = pd.read_sql_query('select * from incidents', engine)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "61edc0d81dcddeeda1b7d405b4e95c3d",
+     "grade": true,
+     "grade_id": "test-index",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Just checking to make sure that your columns are correct at a very basic level\n",
+    "\n",
+    "if ('index' in airlines_df.columns):\n",
+    "    raise ValueError(\"SQL added an index column -- shouldn't have that plus the Pandas index\")\n",
+    "    \n",
+    "if ('index' in airports_df.columns):\n",
+    "    raise ValueError(\"SQL added an index column -- shouldn't have that plus the Pandas index\")\n",
+    "\n",
+    "if ('index' in routes_df.columns):\n",
+    "    raise ValueError(\"SQL added an index column -- shouldn't have that plus the Pandas index\")\n",
+    "\n",
+    "if ('index' in incidents_df.columns):\n",
+    "    raise ValueError(\"SQL added an index column -- shouldn't have that plus the Pandas index\")\n",
+    "    \n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "f766f26d6e4d4f46664a95d4d30ab3d6",
+     "grade": false,
+     "grade_id": "step4-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## Step 4.1: Understanding and inspecting routes_df\n",
+    "\n",
+    "Recall details of `routes_df`...note that we're using `.head(15)` for conciseness, but certainly feel free to view larger chunks of the data table as you go! "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "99503fb5ef13dd236fba0f672d96d482",
+     "grade": false,
+     "grade_id": "routes-info-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 66548 entries, 0 to 66547\n",
+      "Data columns (total 9 columns):\n",
+      "airline_iata        66548 non-null object\n",
+      "airline_id          66548 non-null int64\n",
+      "src_iata_icao       66548 non-null object\n",
+      "source_id           66548 non-null int64\n",
+      "target_iata_icao    66548 non-null object\n",
+      "target_id           66548 non-null int64\n",
+      "code_share          66548 non-null object\n",
+      "stops               66548 non-null int64\n",
+      "equipment           66548 non-null object\n",
+      "dtypes: int64(4), object(5)\n",
+      "memory usage: 4.6+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "routes_df.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "fe18f83f85bc376d2bb4d1eb5b61b0c8",
+     "grade": false,
+     "grade_id": "routes-head-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_iata</th>\n",
+       "      <th>airline_id</th>\n",
+       "      <th>src_iata_icao</th>\n",
+       "      <th>source_id</th>\n",
+       "      <th>target_iata_icao</th>\n",
+       "      <th>target_id</th>\n",
+       "      <th>code_share</th>\n",
+       "      <th>stops</th>\n",
+       "      <th>equipment</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>AER</td>\n",
+       "      <td>2965</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>ASF</td>\n",
+       "      <td>2966</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>ASF</td>\n",
+       "      <td>2966</td>\n",
+       "      <td>MRV</td>\n",
+       "      <td>2962</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>CEK</td>\n",
+       "      <td>2968</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>CEK</td>\n",
+       "      <td>2968</td>\n",
+       "      <td>OVB</td>\n",
+       "      <td>4078</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>DME</td>\n",
+       "      <td>4029</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>DME</td>\n",
+       "      <td>4029</td>\n",
+       "      <td>NBC</td>\n",
+       "      <td>6969</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>DME</td>\n",
+       "      <td>4029</td>\n",
+       "      <td>UUA</td>\n",
+       "      <td>6160</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>EGO</td>\n",
+       "      <td>6156</td>\n",
+       "      <td>KGD</td>\n",
+       "      <td>2952</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>EGO</td>\n",
+       "      <td>6156</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>GYD</td>\n",
+       "      <td>2922</td>\n",
+       "      <td>NBC</td>\n",
+       "      <td>6969</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>KGD</td>\n",
+       "      <td>2952</td>\n",
+       "      <td>EGO</td>\n",
+       "      <td>6156</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td>AER</td>\n",
+       "      <td>2965</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td>ASF</td>\n",
+       "      <td>2966</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>2B</td>\n",
+       "      <td>410</td>\n",
+       "      <td>KZN</td>\n",
+       "      <td>2990</td>\n",
+       "      <td>CEK</td>\n",
+       "      <td>2968</td>\n",
+       "      <td></td>\n",
+       "      <td>0</td>\n",
+       "      <td>CR2</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   airline_iata  airline_id src_iata_icao  source_id target_iata_icao  \\\n",
+       "0            2B         410           AER       2965              KZN   \n",
+       "1            2B         410           ASF       2966              KZN   \n",
+       "2            2B         410           ASF       2966              MRV   \n",
+       "3            2B         410           CEK       2968              KZN   \n",
+       "4            2B         410           CEK       2968              OVB   \n",
+       "5            2B         410           DME       4029              KZN   \n",
+       "6            2B         410           DME       4029              NBC   \n",
+       "7            2B         410           DME       4029              UUA   \n",
+       "8            2B         410           EGO       6156              KGD   \n",
+       "9            2B         410           EGO       6156              KZN   \n",
+       "10           2B         410           GYD       2922              NBC   \n",
+       "11           2B         410           KGD       2952              EGO   \n",
+       "12           2B         410           KZN       2990              AER   \n",
+       "13           2B         410           KZN       2990              ASF   \n",
+       "14           2B         410           KZN       2990              CEK   \n",
+       "\n",
+       "    target_id code_share  stops equipment  \n",
+       "0        2990                 0       CR2  \n",
+       "1        2990                 0       CR2  \n",
+       "2        2962                 0       CR2  \n",
+       "3        2990                 0       CR2  \n",
+       "4        4078                 0       CR2  \n",
+       "5        2990                 0       CR2  \n",
+       "6        6969                 0       CR2  \n",
+       "7        6160                 0       CR2  \n",
+       "8        2952                 0       CR2  \n",
+       "9        2990                 0       CR2  \n",
+       "10       6969                 0       CR2  \n",
+       "11       6156                 0       CR2  \n",
+       "12       2965                 0       CR2  \n",
+       "13       2966                 0       CR2  \n",
+       "14       2968                 0       CR2  "
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "routes_df.head(15)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "77c9bc510d377503d3ed5b4ce9d73a16",
+     "grade": false,
+     "grade_id": "routes-describe-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_id</th>\n",
+       "      <th>source_id</th>\n",
+       "      <th>target_id</th>\n",
+       "      <th>stops</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>66548.000000</td>\n",
+       "      <td>66548.000000</td>\n",
+       "      <td>66548.000000</td>\n",
+       "      <td>66548.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>3367.569754</td>\n",
+       "      <td>2660.201929</td>\n",
+       "      <td>2662.088192</td>\n",
+       "      <td>0.000165</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>3182.024330</td>\n",
+       "      <td>1577.965637</td>\n",
+       "      <td>1578.661433</td>\n",
+       "      <td>0.012856</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>10.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>1317.000000</td>\n",
+       "      <td>1382.000000</td>\n",
+       "      <td>1382.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>2942.000000</td>\n",
+       "      <td>2958.000000</td>\n",
+       "      <td>2958.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>4608.000000</td>\n",
+       "      <td>3670.000000</td>\n",
+       "      <td>3670.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>19676.000000</td>\n",
+       "      <td>9327.000000</td>\n",
+       "      <td>9327.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         airline_id     source_id     target_id         stops\n",
+       "count  66548.000000  66548.000000  66548.000000  66548.000000\n",
+       "mean    3367.569754   2660.201929   2662.088192      0.000165\n",
+       "std     3182.024330   1577.965637   1578.661433      0.012856\n",
+       "min       10.000000      1.000000      1.000000      0.000000\n",
+       "25%     1317.000000   1382.000000   1382.000000      0.000000\n",
+       "50%     2942.000000   2958.000000   2958.000000      0.000000\n",
+       "75%     4608.000000   3670.000000   3670.000000      0.000000\n",
+       "max    19676.000000   9327.000000   9327.000000      1.000000"
+      ]
+     },
+     "execution_count": 8,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "routes_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "e141bdb90745c4a69723b92ef3e62dde",
+     "grade": false,
+     "grade_id": "step4-1-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.1.1 Computing Flight Routes\n",
+    "\n",
+    "Now suppose you are interested in what flights are available out of PHL or JFK.  \n",
+    "\n",
+    "Compute this using `routes_df`, showing just the airline (`airline_iata`), source (`src_iata_icao`) and target (`target_iata_icao`). \n",
+    "\n",
+    "To make it easier to understand, order the result primarily by `src_iata_icao` and secondarily by `target_iata_icao`.\n",
+    "\n",
+    "Name your output `JFK_PHL_df` - this is important, since we'll be grading on this. If you do not follow these policies you may lose points and may not get all of them back - see the regrade policy!"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "b4b78381242c8b53ec4e8d2cfb56a357",
+     "grade": false,
+     "grade_id": "jfk_phl",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: Select routes out of PHL or JFK, showing just the airline (airline_iata), source (src_iata_icao) \n",
+    "# and target (target_iata_icao).  Order the result primarily by src_iata_icao and secondarily by target_iata_icao.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "JFK_PHL_df = routes_df.loc[routes_df['src_iata_icao'].isin(set(['PHL','JFK']))][['airline_iata','src_iata_icao','target_iata_icao']].sort_values(['src_iata_icao','target_iata_icao']).reset_index(drop=True)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "6d6fb517ed155b35dec8aa8c1bc3b1f0",
+     "grade": false,
+     "grade_id": "view-jfk_phl_df",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_iata</th>\n",
+       "      <th>src_iata_icao</th>\n",
+       "      <th>target_iata_icao</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>B6</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ABQ</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>DL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ACC</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>AA</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AMM</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>RJ</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AMM</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>US</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AMM</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>DL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AMS</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>KL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AMS</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>AA</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ANU</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>US</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ANU</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>DY</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ARN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>AF</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>AM</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>AZ</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>DL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>KL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15</th>\n",
+       "      <td>SU</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16</th>\n",
+       "      <td>VS</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>ATL</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17</th>\n",
+       "      <td>B6</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AUA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>18</th>\n",
+       "      <td>DL</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AUA</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>19</th>\n",
+       "      <td>AA</td>\n",
+       "      <td>JFK</td>\n",
+       "      <td>AUH</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   airline_iata src_iata_icao target_iata_icao\n",
+       "0            B6           JFK              ABQ\n",
+       "1            DL           JFK              ACC\n",
+       "2            AA           JFK              AMM\n",
+       "3            RJ           JFK              AMM\n",
+       "4            US           JFK              AMM\n",
+       "5            DL           JFK              AMS\n",
+       "6            KL           JFK              AMS\n",
+       "7            AA           JFK              ANU\n",
+       "8            US           JFK              ANU\n",
+       "9            DY           JFK              ARN\n",
+       "10           AF           JFK              ATL\n",
+       "11           AM           JFK              ATL\n",
+       "12           AZ           JFK              ATL\n",
+       "13           DL           JFK              ATL\n",
+       "14           KL           JFK              ATL\n",
+       "15           SU           JFK              ATL\n",
+       "16           VS           JFK              ATL\n",
+       "17           B6           JFK              AUA\n",
+       "18           DL           JFK              AUA\n",
+       "19           AA           JFK              AUH"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View JFK_PHL_df\n",
+    "JFK_PHL_df.head(20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "88d23262b37e9cd3150665ef6089a5ed",
+     "grade": true,
+     "grade_id": "test_jfk-phl-1",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking your table for correctness\n",
+    "\n",
+    "if (len(JFK_PHL_df.columns) != 3):\n",
+    "    raise ValueError(\"Incorrect number of columns\")\n",
+    "    \n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "3757766bc31ef4e5796878d186527f02",
+     "grade": true,
+     "grade_id": "test_jfk-phl-2",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking your table for correctness\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "54123d720312eee99d2e71c49ec11088",
+     "grade": true,
+     "grade_id": "test_jfk-phl-3",
+     "locked": true,
+     "points": 3,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (3 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (3 pts)\n",
+    "# Checking values in the table\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (3 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "02685c25860cef006f29a202e5f3daac",
+     "grade": false,
+     "grade_id": "step4-1-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.1.2 Busy Airports\n",
+    "\n",
+    "Now let's understand more about the really busy airports in `routes_df`.  To do this, create a dataframe `busy_df` which shows the number of flights out of each source airport, restricted to those with more than 500 such flights.\n",
+    "\n",
+    "Your result should be indexed by `src_iata_icao` with an aggregate field labeled `count` - order the result so that the busiest airport is first."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "c6eb366acf8fdbec37c92a2147a7f64d",
+     "grade": false,
+     "grade_id": "busy-airports",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: reate a dataframe busy_df which shows the number of flights out of each source airport, \n",
+    "# restricted to those with more than 500 such flights. Your result should be indexed by src_iata_icao \n",
+    "# with an aggregate field labeled “count”.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "df = routes_df.groupby('src_iata_icao')[['airline_iata']].count().rename(columns={'airline_iata':'count'})\n",
+    "busy_df = df[df['count'] > 500].sort_values(by=['count'],ascending=False)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "f1629ad99ddd08f92e56d173151f0dcc",
+     "grade": false,
+     "grade_id": "view-busy_df",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>src_iata_icao</th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>ATL</th>\n",
+       "      <td>909</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>ORD</th>\n",
+       "      <td>558</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>LHR</th>\n",
+       "      <td>527</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>PEK</th>\n",
+       "      <td>527</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>CDG</th>\n",
+       "      <td>524</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "               count\n",
+       "src_iata_icao       \n",
+       "ATL              909\n",
+       "ORD              558\n",
+       "LHR              527\n",
+       "PEK              527\n",
+       "CDG              524"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View busy_df\n",
+    "busy_df.head(20)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "a9d4970c26de0d38bb3988480e245ec1",
+     "grade": true,
+     "grade_id": "test-busy1",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking table setup\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "2f195757f6fb40ec4d625e7d701f3b71",
+     "grade": true,
+     "grade_id": "test-busy2",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking table values \n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "235ca5e86c0842b2298cabbb2bff2c8b",
+     "grade": true,
+     "grade_id": "test-busy3",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking table values, more closely \n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "844acbc1ac26837d941b3d7d8eae9bfe",
+     "grade": false,
+     "grade_id": "step4-1-3",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.1.3 Data Visualization\n",
+    "\n",
+    "Visualize this result using a pie-chart with x as the value of `src_iata_icao` and y as the count. To do this, you will need to import `matplotlib`, and specify \"pie\" as the type of the plot."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "095df391f22aa6e9a3c662aa5b88934a",
+     "grade": false,
+     "grade_id": "import-matplotlib",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "import numpy as np"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "acbf72b2909b86956931bec79c4a8a45",
+     "grade": false,
+     "grade_id": "busy-piechart",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "([<matplotlib.patches.Wedge at 0x123089470>,\n",
+       "  <matplotlib.patches.Wedge at 0x123089978>,\n",
+       "  <matplotlib.patches.Wedge at 0x123089e48>,\n",
+       "  <matplotlib.patches.Wedge at 0x123166358>,\n",
+       "  <matplotlib.patches.Wedge at 0x123166828>],\n",
+       " [Text(0.6506884431975033, 0.8869072949802645, 'ATL'),\n",
+       "  Text(-0.8482153003846913, 0.7003790432282424, 'ORD'),\n",
+       "  Text(-1.0002305493957495, -0.4577541349408843, 'LHR'),\n",
+       "  Text(-0.059552728520931714, -1.0983867590815688, 'PEK'),\n",
+       "  Text(0.9431275375358426, -0.5661364216702351, 'CDG')])"
+      ]
+     },
+     "execution_count": 20,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "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\n",
+      "text/plain": [
+       "<Figure size 432x288 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "# TODO: Create a pie-chart of busy_df \n",
+    "# Set x as the value of src_iata_icao and y as the count.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "plt.pie(x=np.array(busy_df['count']), labels=np.array(busy_df.index))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "333a0c934355f02b8bd895d8076811a0",
+     "grade": false,
+     "grade_id": "step4-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## 4.2 Understanding airline information\n",
+    "\n",
+    "Now let's understand the *airline* information within the datasets. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "35ddd1d80ca78e1bd93441576b63cb45",
+     "grade": false,
+     "grade_id": "step4-2-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.2.1 Airlines and Flights\n",
+    "Start by recalling the details of `airlines_df` and `flights_df`, after extracting `flights_df` from the tables."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "da9b15d4d5ce811d04bada63c4929cf2",
+     "grade": false,
+     "grade_id": "load-flights",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: Load flights df from flights as you did earlier\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "flights_df = pd.read_sql_query('select * from flights', engine)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 22,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "fad010c140d3bca1204b6bd35b271b8a",
+     "grade": true,
+     "grade_id": "test-load-flights",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking that you pulled flights_df correctly\n",
+    "\n",
+    "if (len(flights_df) != 570118):\n",
+    "    raise ValueError(\"Make sure you imported the correct table!\")\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "03ec93313f539cbdfc62e5385d5e53fd",
+     "grade": false,
+     "grade_id": "airlines-info-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 6048 entries, 0 to 6047\n",
+      "Data columns (total 8 columns):\n",
+      "airline_id          6048 non-null int64\n",
+      "airline_name        6048 non-null object\n",
+      "alias               6048 non-null object\n",
+      "iata                6048 non-null object\n",
+      "icao                6048 non-null object\n",
+      "airline_callsign    6048 non-null object\n",
+      "airline_country     6048 non-null object\n",
+      "active              6048 non-null object\n",
+      "dtypes: int64(1), object(7)\n",
+      "memory usage: 378.1+ KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "airlines_df.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "042c9d5a25100920837e207b6a4e4f01",
+     "grade": false,
+     "grade_id": "airlines-head-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_id</th>\n",
+       "      <th>airline_name</th>\n",
+       "      <th>alias</th>\n",
+       "      <th>iata</th>\n",
+       "      <th>icao</th>\n",
+       "      <th>airline_callsign</th>\n",
+       "      <th>airline_country</th>\n",
+       "      <th>active</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>1</td>\n",
+       "      <td>Private flight</td>\n",
+       "      <td></td>\n",
+       "      <td>-</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>Y</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2</td>\n",
+       "      <td>135 Airways</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>GNL</td>\n",
+       "      <td>GENERAL</td>\n",
+       "      <td>United States</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>3</td>\n",
+       "      <td>1Time Airline</td>\n",
+       "      <td></td>\n",
+       "      <td>1T</td>\n",
+       "      <td>RNX</td>\n",
+       "      <td>NEXTIME</td>\n",
+       "      <td>South Africa</td>\n",
+       "      <td>Y</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>4</td>\n",
+       "      <td>2 Sqn No 1 Elementary Flying Training School</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>WYT</td>\n",
+       "      <td></td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>5</td>\n",
+       "      <td>213 Flight Unit</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>TFU</td>\n",
+       "      <td></td>\n",
+       "      <td>Russia</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>6</td>\n",
+       "      <td>223 Flight Unit State Airline</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>CHD</td>\n",
+       "      <td>CHKALOVSK-AVIA</td>\n",
+       "      <td>Russia</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>7</td>\n",
+       "      <td>224th Flight Unit</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>TTF</td>\n",
+       "      <td>CARGO UNIT</td>\n",
+       "      <td>Russia</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>8</td>\n",
+       "      <td>247 Jet Ltd</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>TWF</td>\n",
+       "      <td>CLOUD RUNNER</td>\n",
+       "      <td>United Kingdom</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>9</td>\n",
+       "      <td>3D Aviation</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>SEC</td>\n",
+       "      <td>SECUREX</td>\n",
+       "      <td>United States</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>10</td>\n",
+       "      <td>40-Mile Air</td>\n",
+       "      <td></td>\n",
+       "      <td>Q5</td>\n",
+       "      <td>MLA</td>\n",
+       "      <td>MILE-AIR</td>\n",
+       "      <td>United States</td>\n",
+       "      <td>Y</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>11</td>\n",
+       "      <td>4D Air</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>QRT</td>\n",
+       "      <td>QUARTET</td>\n",
+       "      <td>Thailand</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>12</td>\n",
+       "      <td>611897 Alberta Limited</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>THD</td>\n",
+       "      <td>DONUT</td>\n",
+       "      <td>Canada</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>13</td>\n",
+       "      <td>Ansett Australia</td>\n",
+       "      <td></td>\n",
+       "      <td>AN</td>\n",
+       "      <td>AAA</td>\n",
+       "      <td>ANSETT</td>\n",
+       "      <td>Australia</td>\n",
+       "      <td>Y</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>14</td>\n",
+       "      <td>Abacus International</td>\n",
+       "      <td></td>\n",
+       "      <td>1B</td>\n",
+       "      <td></td>\n",
+       "      <td></td>\n",
+       "      <td>Singapore</td>\n",
+       "      <td>Y</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>15</td>\n",
+       "      <td>Abelag Aviation</td>\n",
+       "      <td></td>\n",
+       "      <td>W9</td>\n",
+       "      <td>AAB</td>\n",
+       "      <td>ABG</td>\n",
+       "      <td>Belgium</td>\n",
+       "      <td>N</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    airline_id                                  airline_name alias iata icao  \\\n",
+       "0            1                                Private flight          -        \n",
+       "1            2                                   135 Airways             GNL   \n",
+       "2            3                                 1Time Airline         1T  RNX   \n",
+       "3            4  2 Sqn No 1 Elementary Flying Training School             WYT   \n",
+       "4            5                               213 Flight Unit             TFU   \n",
+       "5            6                 223 Flight Unit State Airline             CHD   \n",
+       "6            7                             224th Flight Unit             TTF   \n",
+       "7            8                                   247 Jet Ltd             TWF   \n",
+       "8            9                                   3D Aviation             SEC   \n",
+       "9           10                                   40-Mile Air         Q5  MLA   \n",
+       "10          11                                        4D Air             QRT   \n",
+       "11          12                        611897 Alberta Limited             THD   \n",
+       "12          13                              Ansett Australia         AN  AAA   \n",
+       "13          14                          Abacus International         1B        \n",
+       "14          15                               Abelag Aviation         W9  AAB   \n",
+       "\n",
+       "   airline_callsign airline_country active  \n",
+       "0                                        Y  \n",
+       "1           GENERAL   United States      N  \n",
+       "2           NEXTIME    South Africa      Y  \n",
+       "3                    United Kingdom      N  \n",
+       "4                            Russia      N  \n",
+       "5    CHKALOVSK-AVIA          Russia      N  \n",
+       "6        CARGO UNIT          Russia      N  \n",
+       "7      CLOUD RUNNER  United Kingdom      N  \n",
+       "8           SECUREX   United States      N  \n",
+       "9          MILE-AIR   United States      Y  \n",
+       "10          QUARTET        Thailand      N  \n",
+       "11            DONUT          Canada      N  \n",
+       "12           ANSETT       Australia      Y  \n",
+       "13                        Singapore      Y  \n",
+       "14              ABG         Belgium      N  "
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "airlines_df.head(15)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "d60a5383f93def9256ad23d065589136",
+     "grade": false,
+     "grade_id": "airlines-describe-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_id</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>6048.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>3844.729167</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>3945.495487</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>-1.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>1512.750000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>3025.500000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>4543.250000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>19845.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         airline_id\n",
+       "count   6048.000000\n",
+       "mean    3844.729167\n",
+       "std     3945.495487\n",
+       "min       -1.000000\n",
+       "25%     1512.750000\n",
+       "50%     3025.500000\n",
+       "75%     4543.250000\n",
+       "max    19845.000000"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "airlines_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "c766697fdfb293141c81e183a3b51a13",
+     "grade": false,
+     "grade_id": "flights-info-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 570118 entries, 0 to 570117\n",
+      "Data columns (total 9 columns):\n",
+      "YEAR             570118 non-null int64\n",
+      "MONTH            570118 non-null int64\n",
+      "DAY_OF_MONTH     570118 non-null int64\n",
+      "CARRIER          570118 non-null object\n",
+      "FL_NUM           570118 non-null int64\n",
+      "ORIGIN           570118 non-null object\n",
+      "DEST             570118 non-null object\n",
+      "ARR_DELAY_NEW    551498 non-null float64\n",
+      "CANCELLED        570118 non-null float64\n",
+      "dtypes: float64(2), int64(4), object(3)\n",
+      "memory usage: 39.1+ MB\n"
+     ]
+    }
+   ],
+   "source": [
+    "flights_df.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "69640a21b73037d31bd8794a886e8dae",
+     "grade": false,
+     "grade_id": "flights-head-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>YEAR</th>\n",
+       "      <th>MONTH</th>\n",
+       "      <th>DAY_OF_MONTH</th>\n",
+       "      <th>CARRIER</th>\n",
+       "      <th>FL_NUM</th>\n",
+       "      <th>ORIGIN</th>\n",
+       "      <th>DEST</th>\n",
+       "      <th>ARR_DELAY_NEW</th>\n",
+       "      <th>CANCELLED</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>1325</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>MCO</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>5159</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>MCO</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>5890</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>MCO</td>\n",
+       "      <td>9.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>6618</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>MCO</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>1701</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>MDW</td>\n",
+       "      <td>8.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>844</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>TPA</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>4679</td>\n",
+       "      <td>SJU</td>\n",
+       "      <td>TPA</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>6294</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>BUR</td>\n",
+       "      <td>20.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>5245</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>DAL</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>2278</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>5125</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>7.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>6215</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>6913</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>DEN</td>\n",
+       "      <td>23.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>3731</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>HOU</td>\n",
+       "      <td>94.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>2018</td>\n",
+       "      <td>1</td>\n",
+       "      <td>2</td>\n",
+       "      <td>WN</td>\n",
+       "      <td>5549</td>\n",
+       "      <td>SLC</td>\n",
+       "      <td>LAS</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "    YEAR  MONTH  DAY_OF_MONTH CARRIER  FL_NUM ORIGIN DEST  ARR_DELAY_NEW  \\\n",
+       "0   2018      1             2      WN    1325    SJU  MCO            0.0   \n",
+       "1   2018      1             2      WN    5159    SJU  MCO            0.0   \n",
+       "2   2018      1             2      WN    5890    SJU  MCO            9.0   \n",
+       "3   2018      1             2      WN    6618    SJU  MCO            0.0   \n",
+       "4   2018      1             2      WN    1701    SJU  MDW            8.0   \n",
+       "5   2018      1             2      WN     844    SJU  TPA           23.0   \n",
+       "6   2018      1             2      WN    4679    SJU  TPA            0.0   \n",
+       "7   2018      1             2      WN    6294    SLC  BUR           20.0   \n",
+       "8   2018      1             2      WN    5245    SLC  DAL            0.0   \n",
+       "9   2018      1             2      WN    2278    SLC  DEN            0.0   \n",
+       "10  2018      1             2      WN    5125    SLC  DEN            7.0   \n",
+       "11  2018      1             2      WN    6215    SLC  DEN            0.0   \n",
+       "12  2018      1             2      WN    6913    SLC  DEN           23.0   \n",
+       "13  2018      1             2      WN    3731    SLC  HOU           94.0   \n",
+       "14  2018      1             2      WN    5549    SLC  LAS            0.0   \n",
+       "\n",
+       "    CANCELLED  \n",
+       "0         0.0  \n",
+       "1         0.0  \n",
+       "2         0.0  \n",
+       "3         0.0  \n",
+       "4         0.0  \n",
+       "5         0.0  \n",
+       "6         0.0  \n",
+       "7         0.0  \n",
+       "8         0.0  \n",
+       "9         0.0  \n",
+       "10        0.0  \n",
+       "11        0.0  \n",
+       "12        0.0  \n",
+       "13        0.0  \n",
+       "14        0.0  "
+      ]
+     },
+     "execution_count": 27,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "flights_df.head(15)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "ac964d0412fe6d8858381168eabc99e1",
+     "grade": false,
+     "grade_id": "flights-describe-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>YEAR</th>\n",
+       "      <th>MONTH</th>\n",
+       "      <th>DAY_OF_MONTH</th>\n",
+       "      <th>FL_NUM</th>\n",
+       "      <th>ARR_DELAY_NEW</th>\n",
+       "      <th>CANCELLED</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>570118.0</td>\n",
+       "      <td>570118.0</td>\n",
+       "      <td>570118.000000</td>\n",
+       "      <td>570118.000000</td>\n",
+       "      <td>551498.000000</td>\n",
+       "      <td>570118.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>mean</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>15.934526</td>\n",
+       "      <td>2573.227781</td>\n",
+       "      <td>12.697799</td>\n",
+       "      <td>0.030115</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>std</th>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>8.983067</td>\n",
+       "      <td>1886.212325</td>\n",
+       "      <td>44.624218</td>\n",
+       "      <td>0.170903</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>min</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>25%</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>8.000000</td>\n",
+       "      <td>924.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>50%</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>16.000000</td>\n",
+       "      <td>2027.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>75%</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>24.000000</td>\n",
+       "      <td>4041.000000</td>\n",
+       "      <td>6.000000</td>\n",
+       "      <td>0.000000</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>max</th>\n",
+       "      <td>2018.0</td>\n",
+       "      <td>1.0</td>\n",
+       "      <td>31.000000</td>\n",
+       "      <td>7439.000000</td>\n",
+       "      <td>2023.000000</td>\n",
+       "      <td>1.000000</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "           YEAR     MONTH   DAY_OF_MONTH         FL_NUM  ARR_DELAY_NEW  \\\n",
+       "count  570118.0  570118.0  570118.000000  570118.000000  551498.000000   \n",
+       "mean     2018.0       1.0      15.934526    2573.227781      12.697799   \n",
+       "std         0.0       0.0       8.983067    1886.212325      44.624218   \n",
+       "min      2018.0       1.0       1.000000       1.000000       0.000000   \n",
+       "25%      2018.0       1.0       8.000000     924.000000       0.000000   \n",
+       "50%      2018.0       1.0      16.000000    2027.000000       0.000000   \n",
+       "75%      2018.0       1.0      24.000000    4041.000000       6.000000   \n",
+       "max      2018.0       1.0      31.000000    7439.000000    2023.000000   \n",
+       "\n",
+       "           CANCELLED  \n",
+       "count  570118.000000  \n",
+       "mean        0.030115  \n",
+       "std         0.170903  \n",
+       "min         0.000000  \n",
+       "25%         0.000000  \n",
+       "50%         0.000000  \n",
+       "75%         0.000000  \n",
+       "max         1.000000  "
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "flights_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "9911282db7f25e44ba4c0f642f113f06",
+     "grade": false,
+     "grade_id": "step4-2-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.2.2 Airline Computations\n",
+    "\n",
+    "Now calculate the following information about airlines in the datasets. Be careful with capitalization and spelling!\n",
+    "\n",
+    "- active_airlines: the number of active airlines in `airlines_df` \n",
+    "\n",
+    "- flights_airlines:  the number of different airlines in `flights_df`\n",
+    "\n",
+    "- missing_flights:  the number of *active* airlines in `airlines_df` that are not in `flights_df`\n",
+    "\n",
+    "Output these in a dictionary called **results** with three keys: `active_airlines`, `flights_airlines`, `missing_flights`.  \n",
+    "\n",
+    "*Hint:  Be careul to use the right identifier for airlines.*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "d91ef62397b781d9b715cd0820f5cc82",
+     "grade": false,
+     "grade_id": "airline_dict",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: output dictionary results {‘active_Airlines’: ___, ‘routes_Airlines’: ___, ‘missing_Routes’: ___}\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "flights_airlines_set = set(flights_df['CARRIER'])\n",
+    "\n",
+    "active_airlines  = len( airlines_df[airlines_df.active == 'Y'] )\n",
+    "flights_airlines = len( flights_df.drop_duplicates(subset='CARRIER') )\n",
+    "missing_flights  = len( airlines_df[ (airlines_df.active == 'Y') & (airlines_df.iata.isin(flights_airlines_set) == False) ] )\n",
+    "\n",
+    "results = {'active_airlines' : active_airlines,\n",
+    "           'flights_airlines': flights_airlines, \n",
+    "           'missing_flights' : missing_flights }\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 30,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "9b850d2cb45df39f1a999695b6a9c956",
+     "grade": false,
+     "grade_id": "view-results-dict",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'active_airlines': 1161, 'flights_airlines': 18, 'missing_flights': 1143}"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View results\n",
+    "results"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0588c3d344c5f025e4b133b987876251",
+     "grade": true,
+     "grade_id": "test-results1",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking the structure and values of results\n",
+    "\n",
+    "if (type(results) != dict):\n",
+    "    raise TypeError(\"You didn't create a dictionary\")\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 32,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "841c0263c477dea2b3198e9f9fa7d99a",
+     "grade": true,
+     "grade_id": "test-results2",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking the structure and values of results\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 33,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0cbfe61197020a65e6900534719d7d97",
+     "grade": true,
+     "grade_id": "test-results4",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking the structure and values of results\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "4a487e36382eb12e959ca42102f94a31",
+     "grade": true,
+     "grade_id": "test-results5",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking the structure and values of results\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "d54a84f9735c7b5e9fe8fdf4d1f634d7",
+     "grade": false,
+     "grade_id": "step4-2-3",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.2.3 \"Risky\" Airlines\n",
+    "\n",
+    "Using `incidents_df`, we want to understand the “risky” airlines.  To do this, calculate the frequency of occurrence of each airline in `incidents_df`, and choose the top-10.  Your result should be a DataFrame called `risky_df` indexed by rank (0 being the most risky), and columns `Airline` and `count`\n",
+    "\n",
+    "You may find the `.reset_index()` method useful.\n",
+    "\n",
+    "Again, we will start by recalling details about `incidents_df`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 35,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "ec83ff70f331eb79957de84f8a4bfe50",
+     "grade": false,
+     "grade_id": "cell-fdb2e4e2cff87fed",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "b6e3aa33ed011062010d68b135858ffe",
+     "grade": false,
+     "grade_id": "incidents-info-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 322 entries, 0 to 321\n",
+      "Data columns (total 3 columns):\n",
+      "Airline      322 non-null object\n",
+      "Date         322 non-null object\n",
+      "FlightNum    322 non-null object\n",
+      "dtypes: object(3)\n",
+      "memory usage: 7.6+ KB\n"
+     ]
+    }
+   ],
+   "source": [
+    "incidents_df.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 43,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "6f0374853d242f8bdbd5da0841990315",
+     "grade": false,
+     "grade_id": "incidents-head1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Airline</th>\n",
+       "      <th>Date</th>\n",
+       "      <th>FlightNum</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Comair</td>\n",
+       "      <td>1997-01-09</td>\n",
+       "      <td>3272</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Stavropolskaya Aktsionernaya Avia</td>\n",
+       "      <td>1997-03-18</td>\n",
+       "      <td>1023</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Merpati Nusantara Airlines</td>\n",
+       "      <td>1997-04-19</td>\n",
+       "      <td>106</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>China Southern Airlines</td>\n",
+       "      <td>1997-05-08</td>\n",
+       "      <td>3456</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>FedEx Express</td>\n",
+       "      <td>1997-07-31</td>\n",
+       "      <td>14</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>Sempati Air</td>\n",
+       "      <td>1997-07-17</td>\n",
+       "      <td>304</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>Korean Air</td>\n",
+       "      <td>1997-08-06</td>\n",
+       "      <td>801</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>Formosa Airlines</td>\n",
+       "      <td>1997-08-10</td>\n",
+       "      <td>7601</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>Vietnam Airlines</td>\n",
+       "      <td>1997-09-03</td>\n",
+       "      <td>815</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>Royal Brunei Airlines</td>\n",
+       "      <td>1997-09-06</td>\n",
+       "      <td>238</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                             Airline        Date FlightNum\n",
+       "0                             Comair  1997-01-09      3272\n",
+       "1  Stavropolskaya Aktsionernaya Avia  1997-03-18      1023\n",
+       "2         Merpati Nusantara Airlines  1997-04-19       106\n",
+       "3            China Southern Airlines  1997-05-08      3456\n",
+       "4                      FedEx Express  1997-07-31        14\n",
+       "5                        Sempati Air  1997-07-17       304\n",
+       "6                         Korean Air  1997-08-06       801\n",
+       "7                   Formosa Airlines  1997-08-10      7601\n",
+       "8                   Vietnam Airlines  1997-09-03       815\n",
+       "9              Royal Brunei Airlines  1997-09-06       238"
+      ]
+     },
+     "execution_count": 43,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "incidents_df.head(10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "24d714ecaae3b3b6b50ae40af432ab51",
+     "grade": false,
+     "grade_id": "incidents-describe1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Airline</th>\n",
+       "      <th>Date</th>\n",
+       "      <th>FlightNum</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>count</th>\n",
+       "      <td>322</td>\n",
+       "      <td>322</td>\n",
+       "      <td>322</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>unique</th>\n",
+       "      <td>236</td>\n",
+       "      <td>309</td>\n",
+       "      <td>301</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>top</th>\n",
+       "      <td>American Airlines</td>\n",
+       "      <td>2001-09-11</td>\n",
+       "      <td>103</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>freq</th>\n",
+       "      <td>7</td>\n",
+       "      <td>4</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                  Airline        Date FlightNum\n",
+       "count                 322         322       322\n",
+       "unique                236         309       301\n",
+       "top     American Airlines  2001-09-11       103\n",
+       "freq                    7           4         3"
+      ]
+     },
+     "execution_count": 44,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "incidents_df.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "9d2286518bb7a0f01675766ef57359f9",
+     "grade": false,
+     "grade_id": "risky_df",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: calculate top-10 \"risky\" airlines\n",
+    "# Put result in a DataFrame called risky_df \n",
+    "# Index your df by rank (0 being the most frequent), and having columns 'Airline' and 'count'.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "risky_df = incidents_df.groupby('Airline').count().rename(columns={'Date':'count'})[['count']].sort_values(by=['count'],ascending=[False])[:10].reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "965103394999fe3b0f8988a06fc624d4",
+     "grade": false,
+     "grade_id": "view-risky",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Airline</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>American Airlines</td>\n",
+       "      <td>7</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Turkish Airlines</td>\n",
+       "      <td>6</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Air France</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>EgyptAir</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Merpati Nusantara Airlines</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>Qantas</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>Southwest Airlines</td>\n",
+       "      <td>5</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>FedEx Express</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>British Airways</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>Scandinavian Airlines</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>China Airlines</td>\n",
+       "      <td>4</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>Asiana Airlines</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>Cubana de Aviación</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>Garuda Indonesia</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>United Airlines</td>\n",
+       "      <td>3</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                       Airline  count\n",
+       "0            American Airlines      7\n",
+       "1             Turkish Airlines      6\n",
+       "2                   Air France      5\n",
+       "3                     EgyptAir      5\n",
+       "4   Merpati Nusantara Airlines      5\n",
+       "5                       Qantas      5\n",
+       "6           Southwest Airlines      5\n",
+       "7                FedEx Express      4\n",
+       "8              British Airways      4\n",
+       "9        Scandinavian Airlines      4\n",
+       "10              China Airlines      4\n",
+       "11             Asiana Airlines      3\n",
+       "12          Cubana de Aviación      3\n",
+       "13            Garuda Indonesia      3\n",
+       "14             United Airlines      3"
+      ]
+     },
+     "execution_count": 40,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View your dataframe\n",
+    "risky_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 47,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "d2e019d61433f1dd2884070ad004afb7",
+     "grade": true,
+     "grade_id": "test-risky1",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking that you created risky_df's base structure\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 48,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "a7fe76af24785063672e1316a7ea9cad",
+     "grade": true,
+     "grade_id": "test-risky2",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking that you created risky_df correctly\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "3bb5e2c5ccd7f67e52c2775dba8c2765",
+     "grade": true,
+     "grade_id": "test-risky3",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking that you created risky_df correctly\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "c32af8d02c36b744692d19d59873e77f",
+     "grade": false,
+     "grade_id": "step4-2-4",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 4.2.4 Delayed and Cancelled\n",
+    "\n",
+    "Now calculate *all* airlines with delayed or cancelled flights, i.e. the airlines of flights in `flights_df` whose arrival was delayed by 30 min or more or which were cancelled.  We will call this `delayed_cancelled_df`, and will use this in the next part of the homework.\n",
+    "\n",
+    "The result should be a dataframe with two columns, `CARRIER` and `count` with the index indicating rank (i.e. entry 0 should be the highest count)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 50,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "002fd2cbffa360a7a0d07988f38ee841",
+     "grade": false,
+     "grade_id": "delayed-cancelled",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: calculate delayed_cancelled_df\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "delayed_cancelled_df = flights_df[ (flights_df.CANCELLED != 0.0) | (flights_df.ARR_DELAY_NEW >= 30) ].groupby('CARRIER')[['YEAR']].count().rename(columns={'YEAR':'count'}).sort_values(by=['count'],ascending=[False]).reset_index()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0b32ca335a769e3ccbfd455036d28a38",
+     "grade": false,
+     "grade_id": "view-dc",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>CARRIER</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>WN</td>\n",
+       "      <td>11762</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>OO</td>\n",
+       "      <td>11093</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>AA</td>\n",
+       "      <td>8186</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>DL</td>\n",
+       "      <td>7910</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>B6</td>\n",
+       "      <td>6447</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>UA</td>\n",
+       "      <td>4778</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>OH</td>\n",
+       "      <td>4657</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>YX</td>\n",
+       "      <td>4303</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>EV</td>\n",
+       "      <td>3896</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>MQ</td>\n",
+       "      <td>3870</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>9E</td>\n",
+       "      <td>3325</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>YV</td>\n",
+       "      <td>2739</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>F9</td>\n",
+       "      <td>1663</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>NK</td>\n",
+       "      <td>1613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>G4</td>\n",
+       "      <td>915</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15</th>\n",
+       "      <td>AS</td>\n",
+       "      <td>894</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16</th>\n",
+       "      <td>VX</td>\n",
+       "      <td>646</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17</th>\n",
+       "      <td>HA</td>\n",
+       "      <td>352</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   CARRIER  count\n",
+       "0       WN  11762\n",
+       "1       OO  11093\n",
+       "2       AA   8186\n",
+       "3       DL   7910\n",
+       "4       B6   6447\n",
+       "5       UA   4778\n",
+       "6       OH   4657\n",
+       "7       YX   4303\n",
+       "8       EV   3896\n",
+       "9       MQ   3870\n",
+       "10      9E   3325\n",
+       "11      YV   2739\n",
+       "12      F9   1663\n",
+       "13      NK   1613\n",
+       "14      G4    915\n",
+       "15      AS    894\n",
+       "16      VX    646\n",
+       "17      HA    352"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View your dataframe\n",
+    "delayed_cancelled_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 52,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "b1cfc1c17ddf1e24e5a6f3f9f38b0c49",
+     "grade": true,
+     "grade_id": "test-dc1",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking that you created delayed_cancelled's base structure\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 53,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "8c9538e9edd19c48444f565ce0d19375",
+     "grade": true,
+     "grade_id": "test-dc2",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking that you created delayed_cancelled correctly\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 54,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "1c9d0da183ef93ac4d2113d0050f3116",
+     "grade": true,
+     "grade_id": "test-dc3",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking that you created risky_df correctly\n",
+    "# Value checks, part 1\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 55,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "747395949bea543aa7b1968f27c5f62f",
+     "grade": true,
+     "grade_id": "test-dc4",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking that you created risky_df correctly\n",
+    "# Value checks, part 2\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "c3e5a93e2b8fc39f0b9f01217e4a6e79",
+     "grade": false,
+     "grade_id": "step5",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## Step 5: Combining DataFrames \n",
+    "\n",
+    "In this part, we want to combine information about airlines from both sources, `risky_df` (pulled from `incidents_df`) and `delayed_cancelled_df` (pulled from `flights_df`) to calculate the “very bad” airlines.  These are airlines that are both “risky” and which are “bad flights.”   This is an example of **data integration**, i.e. of linking data across heterogeneous sources.\n",
+    "\n",
+    "Unfortunately, `incidents_df` uses the *names* of airlines whereas `flights_df` uses *IATA codes*.  However, the dataset `airlines_df` contains a correspondence between airline names and IATA codes which can be used to \"translate\" the airport IATA codes in `flights_df` to airline names. \n",
+    "\n",
+    "Although it may be clear to you which columns match between the two DataFrames, in general the number of columns (schemas) may be very large in datasets so it is not always obvious.  It is therefore helpfult to develop **schema matching** techniques to help discover these correspondences. \n",
+    "\n",
+    "We will use a very simple technique here to find what columns relate between `airlines_df` and `flights_df`, and then use this to combine `risky_df` and `delayed_cancelled_df`."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "bcf25683e21466a7787e9ecce723a871",
+     "grade": false,
+     "grade_id": "step5-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## 5.1 Relating Airlines and Flights: Schema Matching\n",
+    "\n",
+    "Let's start by detecting what fields (columns) “match” between the `airlines_df` and `flights_df` DataFrames.  \n",
+    "\n",
+    "To do this, let’s note that we only care about the “categorical” (string-valued) columns.  What we want is, e.g., to find fields that have lots of common values (for instance, airline abbreviations or airport codes).  To measure this in a principled way, we’ll use a measure called the Jaccard distance (or Jaccard index or Jaccard measure).  The Jaccard distance measures similarity between two sets A and B, and is merely:\n",
+    "\n",
+    "\\begin{equation*}\n",
+    "| A \\cap B | / |A \\cup B|\n",
+    "\\end{equation*}\n",
+    "\n",
+    "Let’s compute the Jaccard distances between (the values of) all pairs of attributes in `airlines_df` and `flights_df`. This will tell us which attributes include similar values - and thus which might represent the same concept. "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "b820be58d726432c578a6fb91ff3db67",
+     "grade": false,
+     "grade_id": "step5-1-1",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 5.1.1 Column / Schema Matches\n",
+    "\n",
+    "Create a Cell with an algorithm that iterates over all `airlines_df` keys (columns) and all `flights_df` keys. Create a nested map of: \n",
+    "\n",
+    "$${r → {p → distance}}$$\n",
+    "\n",
+    "Your algorithm should store the Jaccard distance between the values in routes column $r$ to the values in performance column $p$ (for distances that are non-zero and only for non-numeric columns).  \n",
+    "\n",
+    "Remember, since there may be duplicates, you’ll need to convert columns into sets of unique values through `drop_duplicates()`.  \n",
+    "\n",
+    "Your keys for the outer dictionary, from flights, should be: `CARRIER`, `ORIGIN`, and `DEST`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 69,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "1c19419d995f06c0148135adda603e93",
+     "grade": false,
+     "grade_id": "best-match",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# Find what columns relate in airlines_df and flights_df \n",
+    "# TODO: create nested map of Jaccard distance\n",
+    "# Your keys for the outer dictionary, from flights, should be:\n",
+    "# CARRIER, ORIGIN, and DEST\n",
+    "\n",
+    "best_match = {}\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "outer_df = flights_df\n",
+    "inner_df = airlines_df\n",
+    "\n",
+    "for outer_key in ['CARRIER','ORIGIN','DEST']:\n",
+    "    # init outer dict\n",
+    "    best_match[outer_key] = {}\n",
+    "    # get the set of values in the outer column from flights_df\n",
+    "    outer_set = set(outer_df[outer_key])\n",
+    "    for inner_key in inner_df.keys():\n",
+    "        # column value is non-numeric\n",
+    "        if inner_df[inner_key].dtype == object:\n",
+    "            # get the set of values in the inner column from airlines_df\n",
+    "            inner_set = set(inner_df[inner_key])\n",
+    "            join      = len( outer_set & inner_set )\n",
+    "            # jaccard distance is not zero\n",
+    "            if join > 0:\n",
+    "                union   = float( len( outer_set | inner_set ) )\n",
+    "                jaccard = join / union\n",
+    "                best_match[outer_key][inner_key] = jaccard\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 71,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "{'CARRIER': {'iata': 0.01651376146788991},\n",
+       " 'ORIGIN': {'icao': 0.035829512650704706,\n",
+       "  'airline_callsign': 0.0005409304002884963},\n",
+       " 'DEST': {'icao': 0.035829512650704706,\n",
+       "  'airline_callsign': 0.0005409304002884963}}"
+      ]
+     },
+     "execution_count": 71,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View your dictionary\n",
+    "best_match"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 72,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "71e75ad5c48392df4cf9799230330682",
+     "grade": true,
+     "grade_id": "test-jaccard1",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking the structure of best_match\n",
+    "\n",
+    "if (type(best_match) != dict):\n",
+    "    raise TypeError(\"You didn't create a dictionary\")\n",
+    "    \n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 73,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "9b1c5c5579ead37baf60e5b01103f70f",
+     "grade": true,
+     "grade_id": "test-jaccard2",
+     "locked": true,
+     "points": 2,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (2 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (2 pts)\n",
+    "# Checking the Jaccard mappings\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (2 pts)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 74,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "066e12a3d760c23bec4e8090fd511ed1",
+     "grade": true,
+     "grade_id": "test-jaccard3",
+     "locked": true,
+     "points": 3,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (3 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (3 pts)\n",
+    "# Checking the Jaccard values\n",
+    "\n",
+    "    \n",
+    "print('[CIS 545 Test Cases] (3 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "22df29eacb4d575a1e239fb5b7515a48",
+     "grade": false,
+     "grade_id": "step5-1-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "### 5.1.2 Matching columns\n",
+    "\n",
+    "The above map should help you decide which column in `airlines_df` is the best match for `CARRIER` in `flights_df`.\n",
+    "\n",
+    "Note that the ORIGIN and DEST codes also have a match which doesn't make much sense; they are 3-letter **airport** codes rather than a 3-letter **airline** codes.  So you need to use your own knowledge of the semantics of the fields to disambiguate which pairs are correct.  In this case, we will just use the match for `CARRIER`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 83,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "046f8129ecffae8f234f334a88232ff7",
+     "grade": false,
+     "grade_id": "carrier-mapping",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "iata\n"
+     ]
+    }
+   ],
+   "source": [
+    "# TODO: pdate the dictionary to include the name of the attribute in airports_df that corresponds to CARRIER.\n",
+    "\n",
+    "# Update here!\n",
+    "my_choice = max( best_match['CARRIER'], key=best_match['CARRIER'].get )\n",
+    "\n",
+    "mapping = {'CARRIER': my_choice} \n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "# print(my_choice)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 81,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "a246a4d01a3d0d45ed36dcea602aa531",
+     "grade": true,
+     "grade_id": "test-carrier-mapping",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking the Jaccard values\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "a48de6b4738bd10fab9bcd16eab245da",
+     "grade": false,
+     "grade_id": "step5-2",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## 5.2  Joining DataFrames\n",
+    "\n",
+    "Now that you know how `airports_df` and `flights_df` relate, use this to add the names of airports to `delayed_cancelled_df`.  Note that each data source (and thus DataFrame) is in fact incomplete.  For this step we’ll want to only consider the airport information and flight information that “intersect.”\n",
+    "\n",
+    "Create a DataFrame `delayed_cancelled_ext_df` by merging `delayed_cancelled_df` and `airports_df` on the fields that correspond to airport IATA codes in each DataFrame.  Use `delayed_cancelled.merge` as well as `left_on` and `right_on`.\n",
+    "\n",
+    "The result should have columns `airline_name`, `airline_id` and `count`.\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 90,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "df80c3d29449c307708662d6a15eac20",
+     "grade": false,
+     "grade_id": "dc-ext",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: create joint DataFrame delayed_cancelled_ext_df.  \n",
+    "# The result should have columns airline_name, airline_id and count.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "delayed_cancelled_ext_df = delayed_cancelled_df.merge(right=airlines_df[['airline_name','airline_id',mapping['CARRIER']]], left_on='CARRIER', right_on=mapping['CARRIER'])[['airline_name','airline_id','count']]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 91,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "dbd18794038d29290e0cfda10fdd2786",
+     "grade": false,
+     "grade_id": "view-dc-ext",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_name</th>\n",
+       "      <th>airline_id</th>\n",
+       "      <th>count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Southwest Airlines</td>\n",
+       "      <td>4547</td>\n",
+       "      <td>11762</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>SkyWest</td>\n",
+       "      <td>4738</td>\n",
+       "      <td>11093</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>American Airlines</td>\n",
+       "      <td>24</td>\n",
+       "      <td>8186</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Delta Air Lines</td>\n",
+       "      <td>2009</td>\n",
+       "      <td>7910</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>JetBlue Airways</td>\n",
+       "      <td>3029</td>\n",
+       "      <td>6447</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>United Airlines</td>\n",
+       "      <td>5209</td>\n",
+       "      <td>4778</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>Comair</td>\n",
+       "      <td>1828</td>\n",
+       "      <td>4657</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>Midwest Airlines</td>\n",
+       "      <td>3497</td>\n",
+       "      <td>4303</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>Atlantic Southeast Airlines</td>\n",
+       "      <td>452</td>\n",
+       "      <td>3896</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>American Eagle Airlines</td>\n",
+       "      <td>659</td>\n",
+       "      <td>3870</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>10</th>\n",
+       "      <td>Pinnacle Airlines</td>\n",
+       "      <td>3976</td>\n",
+       "      <td>3325</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>11</th>\n",
+       "      <td>Mesa Airlines</td>\n",
+       "      <td>3466</td>\n",
+       "      <td>2739</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>12</th>\n",
+       "      <td>Frontier Airlines</td>\n",
+       "      <td>2468</td>\n",
+       "      <td>1663</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>13</th>\n",
+       "      <td>Spirit Airlines</td>\n",
+       "      <td>4687</td>\n",
+       "      <td>1613</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>14</th>\n",
+       "      <td>Allegiant Air</td>\n",
+       "      <td>35</td>\n",
+       "      <td>915</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>15</th>\n",
+       "      <td>Alaska Airlines</td>\n",
+       "      <td>439</td>\n",
+       "      <td>894</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>16</th>\n",
+       "      <td>Virgin America</td>\n",
+       "      <td>5331</td>\n",
+       "      <td>646</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>17</th>\n",
+       "      <td>Hawaiian Airlines</td>\n",
+       "      <td>2688</td>\n",
+       "      <td>352</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                   airline_name  airline_id  count\n",
+       "0            Southwest Airlines        4547  11762\n",
+       "1                       SkyWest        4738  11093\n",
+       "2             American Airlines          24   8186\n",
+       "3               Delta Air Lines        2009   7910\n",
+       "4               JetBlue Airways        3029   6447\n",
+       "5               United Airlines        5209   4778\n",
+       "6                        Comair        1828   4657\n",
+       "7              Midwest Airlines        3497   4303\n",
+       "8   Atlantic Southeast Airlines         452   3896\n",
+       "9       American Eagle Airlines         659   3870\n",
+       "10            Pinnacle Airlines        3976   3325\n",
+       "11                Mesa Airlines        3466   2739\n",
+       "12            Frontier Airlines        2468   1663\n",
+       "13              Spirit Airlines        4687   1613\n",
+       "14                Allegiant Air          35    915\n",
+       "15              Alaska Airlines         439    894\n",
+       "16               Virgin America        5331    646\n",
+       "17            Hawaiian Airlines        2688    352"
+      ]
+     },
+     "execution_count": 91,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View delayed_cancelled_ext_df\n",
+    "delayed_cancelled_ext_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 92,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0b099c1e69cb247bad2f3203e06cb10d",
+     "grade": true,
+     "grade_id": "test-dc-ext1",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking delayed_cancelled_ext_df\n",
+    "\n",
+    "if (delayed_cancelled_ext_df.shape[1] != 3):\n",
+    "    raise ValueError(\"Unexpected number of columns\")\n",
+    "    \n",
+    "if (delayed_cancelled_ext_df.shape[0] <= 5):\n",
+    "    raise ValueError(\"Probably missing rows...\")\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 93,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "a605e8e4f4b8b02c841f5bf8afb6539f",
+     "grade": true,
+     "grade_id": "test-dc-ext2",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking delayed_cancelled_ext_df\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 94,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "e6bd030b303e88bb4e583bc33db97501",
+     "grade": true,
+     "grade_id": "test-dc-ext3",
+     "locked": true,
+     "points": 4,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (4 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (4 pts)\n",
+    "# Checking delayed_cancelled_ext_df\n",
+    "\n",
+    "if (max(delayed_cancelled_ext_df['count']) < 1000):\n",
+    "    raise ValueError(\"Maximum count seems too low\")\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (4 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "2bc1dceba7df2ddba805217fe8279388",
+     "grade": false,
+     "grade_id": "step5-3",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## 5.3 Calculate \"very bad\" airlines\n",
+    "\n",
+    "We are finally in a position to calculate the “very bad” airlines, i.e. those that are in both `risky_df` and `delayed_cancelled_ext_df`. Do this by merging the two DataFrames to create a result, `very_bad_df` - you'll note that this has two `count` columns, which won't work:\n",
+    "\n",
+    "- Rename the `risky_df` column to `accident_count`\n",
+    "- For `delayed_cancelled_ext_df`, use `dc_count`\n",
+    "\n",
+    "Your dataframe should have `airline_name` as well as the two counts."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 100,
+   "metadata": {
+    "deletable": false,
+    "nbgrader": {
+     "checksum": "566837ba899c50a756073a40aa904de6",
+     "grade": false,
+     "grade_id": "very-bad",
+     "locked": false,
+     "schema_version": 1,
+     "solution": true
+    }
+   },
+   "outputs": [],
+   "source": [
+    "# TODO: Merge the two DataFrames to create a result that has airline_name, as well as accident_count and dc_count.\n",
+    "\n",
+    "# YOUR CODE HERE\n",
+    "# raise NotImplementedError()\n",
+    "\n",
+    "very_bad_df = risky_df.rename(columns={'count':'accident_count'}).merge(right=delayed_cancelled_ext_df.rename(columns={'count':'dc_count'}),left_on='Airline',right_on='airline_name')[['airline_name','accident_count','dc_count']]\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 101,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "cdbabab3cae6caa9327ae6b92435a935",
+     "grade": false,
+     "grade_id": "view-very-bad",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>airline_name</th>\n",
+       "      <th>accident_count</th>\n",
+       "      <th>dc_count</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>American Airlines</td>\n",
+       "      <td>7</td>\n",
+       "      <td>8186</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Southwest Airlines</td>\n",
+       "      <td>5</td>\n",
+       "      <td>11762</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "         airline_name  accident_count  dc_count\n",
+       "0   American Airlines               7      8186\n",
+       "1  Southwest Airlines               5     11762"
+      ]
+     },
+     "execution_count": 101,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# View very_bad_df\n",
+    "very_bad_df"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 102,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "21b440a6d715c7423cb37b08d868cf06",
+     "grade": true,
+     "grade_id": "test-vbad1",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking very_bad_df\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 103,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "ed29061541c6049560a1993c09323b7a",
+     "grade": true,
+     "grade_id": "test-vbad2",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking very_bad_df - ballpark\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 104,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0e54410c9a03a921e4a88079952b2c89",
+     "grade": true,
+     "grade_id": "test-vbad3",
+     "locked": true,
+     "points": 1,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (1 pt)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (1 pt)\n",
+    "# Checking very_bad_df - exact\n",
+    "\n",
+    "\n",
+    "print('[CIS 545 Test Cases] (1 pt)')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 105,
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "0b46543110b980521765d54154b962a2",
+     "grade": true,
+     "grade_id": "test-vbad4",
+     "locked": true,
+     "points": 3,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CIS 545 Test Cases] (3 pts)\n"
+     ]
+    }
+   ],
+   "source": [
+    "# [CIS 545 Test Cases] (3 pts)\n",
+    "# Checking very_bad_df - exact\n",
+    " \n",
+    "\n",
+    "print('[CIS 545 Test Cases] (3 pts)')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "deletable": false,
+    "editable": false,
+    "nbgrader": {
+     "checksum": "8bc28f21f2b2f41b49f705566f6be609",
+     "grade": false,
+     "grade_id": "submit",
+     "locked": true,
+     "schema_version": 1,
+     "solution": false
+    }
+   },
+   "source": [
+    "## Submission\n",
+    "\n",
+    "As per the Homework 1 write-up, please submit your assignment on OpenSubmit as a zip file, `hw1.zip`, containing **only** `Homework 1-1.ipynb` and `Homework 1-2.ipynb` - you should NOT include the dataset descriptions or any of the datasets in your submission!\n",
+    "\n",
+    "Please make sure to run your notebooks fully and make sure they work prior to submission. This will help you catch typos and other errors that could cost test case points.\n",
+    "\n",
+    "The assignment is due Feburary 11, 2019 at 10PM. Although we include a 1 hour grace period for submissions, that is meant to avoid having to take late days due to any errors in submission or validation or errors caught at the last minute. Going past this means you'll be taking late days, which will be 3 days after this period unless stated otherwise!"
+   ]
+  }
+ ],
+ "metadata": {
+  "anaconda-cloud": {},
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.1"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
